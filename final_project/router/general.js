@@ -34,66 +34,88 @@ public_users.post("/register", (req,res) => {
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-  //Write your code here
-  res.send(JSON.stringify(books,null,4));
+  //Creating a promise method. The promise will get resolved when book list retrieved from datasource 
+  let promiseBookList = new Promise((resolve,reject) => {
+    console.log('inside the promise');
+    resolve(JSON.stringify(books,null,4));
+  })
+  //Call the promise and wait for it to be resolved and send back book list.
+  promiseBookList.then((bookList) => {
+  //  console.log("From Callback " + bookList)
+    res.send(bookList);
+  })
+ 
 });
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
-  let isbn = req.params.isbn;
-  let book = books[isbn];
-  if(book) {
-      res.send(book);
-  } else {
-     res.send(`Book with ISBN ${isbn} does not exist!`);
-  }
-//  return res.status(300).json({message: "Yet to be implemented"});
- });
+  //Creating a promise method. The promise will get resolved when book is retrieved from datasource 
+  let promiseBookByIsbn = new Promise((resolve,reject) => {
+    let isbn = req.params.isbn;
+    let book = books[isbn];
+    if(book) {
+        resolve(book);
+    } else {
+        resolve(`Book with ISBN ${isbn} does not exist!`);
+    }
+})
+
+  //Call the promise and wait for it to be resolved and send back book.
+  promiseBookByIsbn.then((message) => {
+    res.send(message);
+  })
+
+});
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
-  //Write your code here
-  /*const booksArr = [];
-  Object.keys(books).forEach(key=>{
-      booksArr.push({'isbn': key
-                   , 'author': books[key].author
-                   , 'title': books[key].title
-                   , 'reviews': books[key].reviews});
-  });
-  */
- const authorBooks = {};
+  //Creating a promise method. The promise will get resolved when book list is retrieved from datasource 
+  let promiseBookByAuthor = new Promise((resolve,reject) => {
+    const authorBooks = {};
 
-  let author = req.params.author;
+    let author = req.params.author;
 
-  Object.keys(books).forEach(key=>{
+    Object.keys(books).forEach(key=>{
       if(books[key].author == author) authorBooks[key] = books[key];
-  });
+    });
 
-  if(Object.keys(authorBooks).length > 0) {
-      res.send(authorBooks);
-  } else {
-      res.send(`Sorry, there are no books by author ${author}.`)
-  }
+    if(Object.keys(authorBooks).length > 0) {
+        resolve(authorBooks)
+    } else {
+        resolve(`Sorry, there are no books by author ${author}.`)
+    }
+  })//end promise method
 
+  //Call the promise and wait for it to be resolved and send back book list.
+  promiseBookByAuthor.then((message) => {
+    res.send(message);
+  })
 });
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
-  //Write your code here
-  const titleBooks = {};
+  //Creating a promise method. The promise will get resolved when book is retrieved from datasource 
+  let promiseBookByTitle = new Promise((resolve,reject) => {
+    const titleBooks = {};
 
-  let title = req.params.title;
+    let title = req.params.title;
 
-  Object.keys(books).forEach(key=>{
+    Object.keys(books).forEach(key=>{
       if(books[key].title == title) titleBooks[key] = books[key];
-  });
+    });
 
-  if(Object.keys(titleBooks).length > 0) {
-      res.send(titleBooks);
-  } else {
-      res.send(`Sorry, there are no books with Title ${title}.`)
-  }
+    if(Object.keys(titleBooks).length > 0) {
+      resolve(titleBooks);
+    } else {
+      resolve(`Sorry, there are no books with Title ${title}.`)
+    }
+  })//end promise method
+
+  //Call the promise and wait for it to be resolved and send back book.
+  promiseBookByTitle.then((message) => {
+    res.send(message);
+  })
+
 });
 
 //  Get book review
